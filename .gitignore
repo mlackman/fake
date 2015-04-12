@@ -14,6 +14,12 @@
 .repl_history
 build/
 
+##Ignore vim swp files
+
+
+##Ignore vim swp files
+**/*.swp
+
 ## Documentation cache and generated files:
 /.yardoc/
 /_yardoc/
