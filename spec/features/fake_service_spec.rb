@@ -5,6 +5,20 @@ describe 'Fake Service' do
   let(:fs) { Fake::Service.new(port:4567) }
   after(:each) { fs.stop }
 
+  describe "configuration" do
+    let(:fs) { Fake::Service.new(bind:'127.0.0.1') }
+    it "can be bind to different addresses" do
+      fs.get('/').respond(body:"ok")
+      fs.start
+      expect(HTTParty.get('http://127.0.0.1:8080').body).to eq "ok"
+    end
+  end
+
+  describe "many fake services on different ports" do
+    xit "handles requests ok" do
+    end
+  end
+
   describe "Simple service without parameters" do
     it "simple to setup" do
       fs.get('/').respond(body:"_response_")
@@ -42,6 +56,33 @@ describe 'Fake Service' do
         fs.get('/cart/:id/status').response(body:"ok")
         fs.start
         expect(HTTParty.get('http://localhost:4567/cart/path/status').response.body).to eq "ok"
+      end
+    end
+
+    describe "Responding specific request" do
+      xit "can respond based on query parameter" do
+        # what about specific parameters vs some parameter
+        fs.get('/cart/option').param('id=5').respond("ok") # Matches /cart/option?id=5,
+      end
+    end
+
+    describe "Checking request parameters" do
+      it "can verify single parameter" do
+        fs.get('/cart')
+        fs.start
+        HTTParty.get('http://localhost:4567/cart?id=5&status=pending')
+        params = Fake::Requests.request(:get, '/cart').params
+        expect(params.has_key? 'id')
+        expect(params.has_key? 'status')
+        expect(params["id"]).to eq "5"
+        expect(params["status"]).to eq "pending"
+      end
+
+      xit "can name a request to ease matching of request" do
+        fs.get('/cart', name: :my_cart_request)
+        fs.start
+        HTTParty.get('http://localhost:4567/cart?id=5&status=pending')
+        expect(Fake::Requests.request(:my_cart_request)).not_to be nil
       end
     end
 

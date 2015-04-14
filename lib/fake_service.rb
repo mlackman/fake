@@ -1,4 +1,6 @@
 require 'rack'
+require 'singleton'
+require 'WEBrick'
 
 Thread.abort_on_exception = true
 
@@ -73,22 +75,29 @@ module Fake
     end
 
     def call(env)
+      request = Rack::Request.new(env)
+      # TODO: Make this part of rack stack
+      Requests.add_request(request)
+
       @handlers.each do |handler|
-        response = handler.call(Rack::Request.new(env))
+        response = handler.call(request)
         return response if response
       end
+      raise "NO HANDLER for #{request.path}"
     end
   end
 
   class Server
 
-    def start(rack_app, port)
+    def start(rack_app, webrick_config)
+      return unless @server_thread.nil?
       mutex = Mutex.new
       server_started = ConditionVariable.new
-      @server_thread = Thread.new(rack_app, port) do |app, port|
-        Rack::Handler::WEBrick.run(app, Port:port) do
-          server_started.signal
-        end
+      @server_thread = Thread.new(rack_app, webrick_config) do |app, config|
+        @server = WEBrick::HTTPServer.new(config)
+        @server.mount "/", Rack::Handler::WEBrick, app
+        server_started.signal
+        @server.start
       end
       mutex.synchronize do
         server_started.wait(mutex)
@@ -96,15 +105,18 @@ module Fake
     end
 
     def stop
-      Rack::Handler::WEBrick.shutdown
-      @server_thread.join
+      unless @server_thread.nil?
+        @server.shutdown
+        @server_thread.join if @server_thread.alive?
+        @server_thread = nil
+      end
     end
   end
 
   class Service
-    def initialize(port=8080)
+    def initialize(port:8080, bind:"localhost")
       @app = RackApp.new
-      @port = port[:port]
+      @webrick_config = {Port:port, BindAddress:bind}
       @server = Server.new
     end
 
@@ -115,12 +127,40 @@ module Fake
     end
 
     def start
-      @server.start(@app, @port)
+      @server.start(@app, @webrick_config)
     end
 
     def stop
       @server.stop
     end
+  end
+
+  class Requests
+
+    attr_accessor :requests
+    include Singleton
+    class << self
+      def request(method, path)
+        matching_request = nil
+        instance.requests.each do |request|
+          if request.request_method == method.to_s.upcase &&
+             request.path == path
+            matching_request = request
+          end
+        end
+        matching_request
+      end
+
+      def add_request(request)
+        instance.requests << request
+      end
+    end
+  private
+    def initialize
+      @requests = []
+    end
+
+
   end
 end
 
