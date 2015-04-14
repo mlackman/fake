@@ -1,8 +1,8 @@
 Gem::Specification.new do |s|
-  s.name        = "fake_service"
+  s.name        = "yafs"
   s.version     = "0.0.1"
   s.platform    = Gem::Platform::RUBY
-  s.summary     = "Fake http service for e2e tests"
+  s.summary     = "Yet another fake http service for e2e tests"
   s.email       = "mika.lackman@gmail.com"
   s.description = "Fake http service, which is easy to use in tests"
   s.authors     = ['Mika Lackman']
