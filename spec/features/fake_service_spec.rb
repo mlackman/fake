@@ -20,11 +20,18 @@ describe 'Fake Service' do
   end
 
   describe "Simple service without parameters" do
-    it "simple to setup" do
-      fs.get('/').respond(body:"_response_")
-      fs.start
+    before(:each) { Fake.start(port:4567) }
+    after(:each) { Fake.stop }
 
+    it "can handle get" do
+      Fake.get('/').respond(body:"_response_")
       response = HTTParty.get('http://localhost:4567')
+      expect(response.body).to eq "_response_"
+    end
+
+    it "can handle post" do
+      Fake.post('/').respond(body:"_response_")
+      response = HTTParty.post('http://localhost:4567')
       expect(response.body).to eq "_response_"
     end
   end

@@ -1,6 +1,9 @@
 require 'rack'
 require 'singleton'
 require 'WEBrick'
+require_relative './fake/service.rb'
+require_relative './fake/request_handler.rb'
+require_relative './fake/fake.rb'
 
 Thread.abort_on_exception = true
 
@@ -33,22 +36,6 @@ module Fake
       @current_item_index += 1 if @current_item_index < (@items.count - 1)
       item
     end
-  end
-
-  class RequestHandler
-    attr_reader :responses
-
-    def initialize(path)
-      @path = path
-      @responses = InfiniteQueue.new
-    end
-
-    def call(request)
-      return unless request.path.eql? @path
-      current_response = @responses.next
-      Rack::Response.new([current_response.body], status=current_response.status)
-    end
-
   end
 
   class RequestHandlerBuilder
@@ -112,29 +99,6 @@ module Fake
       end
     end
   end
-
-  class Service
-    def initialize(port:8080, bind:"localhost")
-      @app = RackApp.new
-      @webrick_config = {Port:port, BindAddress:bind}
-      @server = Server.new
-    end
-
-    def get(path)
-      request_handler = RequestHandler.new(path)
-      @app.add_request_handler(request_handler)
-      RequestHandlerBuilder.new(request_handler)
-    end
-
-    def start
-      @server.start(@app, @webrick_config)
-    end
-
-    def stop
-      @server.stop
-    end
-  end
-
   class Requests
 
     attr_accessor :requests
