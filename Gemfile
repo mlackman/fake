@@ -2,7 +2,8 @@ source 'https://rubygems.org'
 
 gem 'rack'
 
-group :test do
+group :development, :test do
+  gem 'pry'
   gem 'httparty'
   gem 'rspec'
 end

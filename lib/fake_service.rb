@@ -3,6 +3,8 @@ require 'singleton'
 require 'WEBrick'
 require_relative './fake/service.rb'
 require_relative './fake/request_handler.rb'
+require_relative './fake/requests.rb'
+require_relative './fake/request.rb'
 require_relative './fake/fake.rb'
 
 Thread.abort_on_exception = true
@@ -62,7 +64,8 @@ module Fake
     end
 
     def call(env)
-      request = Rack::Request.new(env)
+      request = Fake::Request.new(env)
+
       # TODO: Make this part of rack stack
       Requests.add_request(request)
 
@@ -98,33 +101,6 @@ module Fake
         @server_thread = nil
       end
     end
-  end
-  class Requests
-
-    attr_accessor :requests
-    include Singleton
-    class << self
-      def request(method, path)
-        matching_request = nil
-        instance.requests.each do |request|
-          if request.request_method == method.to_s.upcase &&
-             request.path == path
-            matching_request = request
-          end
-        end
-        matching_request
-      end
-
-      def add_request(request)
-        instance.requests << request
-      end
-    end
-  private
-    def initialize
-      @requests = []
-    end
-
-
   end
 end
 

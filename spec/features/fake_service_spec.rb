@@ -91,6 +91,43 @@ describe 'Fake Service' do
         HTTParty.get('http://localhost:4567/cart?id=5&status=pending')
         expect(Fake::Requests.request(:my_cart_request)).not_to be nil
       end
+
+      context "from post request" do
+        before do
+          Fake.start(port:4567)
+          Fake.post('/').respond(status:400)
+        end
+        after do
+          Fake.stop
+        end
+        context "when content-type is 'application/json'" do
+          before do
+            HTTParty.post('http://localhost:4567/', body:{"data" => {"some"=>"1", "thing"=>"0"}}.to_json,
+                                                    headers: {"Content-Type"=>"application/json"})
+          end
+          it "sets the parsed json to params" do
+            request = Fake::Requests.request(:post, '/')
+            expect(request.params['data']['some']).to eq '1'
+            expect(request.params['data']['thing']).to eq '0'
+          end
+
+          it "the json is available for subsequent requests" do
+            request = Fake::Requests.request(:post, '/')
+            expect(request.params['data']['some']).to eq '1'
+            expect(request.params['data']['thing']).to eq '0'
+            request = Fake::Requests.request(:post, '/')
+            expect(request.params['data']['some']).to eq '1'
+            expect(request.params['data']['thing']).to eq '0'
+          end
+
+          context "when post body not received" do
+            xit "raises error or what?" do
+            end
+          end
+        end
+
+      end
+
     end
 
     describe "ordering" do
