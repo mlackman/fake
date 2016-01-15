@@ -16,7 +16,8 @@ module Fake
       if request.path.eql?(@path) && request.request_method.eql?(@method.to_s.upcase)
         current_response = @responses.next
         raise "FAKE service: No response set for request #{presentation}" if current_response.nil?
-        Rack::Response.new([current_response.body], status=current_response.status)
+        current_response.evaluate()
+        Rack::Response.new([current_response.body], status=current_response.status, header=current_response.headers)
       end
     end
 

@@ -47,6 +47,16 @@ describe 'Fake Service' do
     end
   end
 
+  describe "Headers" do
+    it "sets headers to response" do
+      fs.get('/').respond(headers: {"x-header" => "someurl"})
+      fs.start
+      response = HTTParty.get('http://localhost:4567')
+      expect(response.headers).to include("x-header")
+      expect(response.headers['x-header']).to eq "someurl"
+    end
+  end
+
   describe "Paths" do
     describe "static paths" do
       it "routes requests to correct handler" do
@@ -158,9 +168,19 @@ describe 'Fake Service' do
         "my response"
       end
       fs.start
-
       expect(HTTParty.get('http://localhost:4567').response.body).to eq "my response"
     end
+
+    it "can access response object" do
+      fs.get('/').respond do |r|
+        r.status = 201
+        "response"
+      end
+      fs.start
+      expect(HTTParty.get('http://localhost:4567').response.code).to eq "201"
+    end
+
+
   end
 
 end

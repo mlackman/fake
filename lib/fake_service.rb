@@ -39,8 +39,8 @@ module Fake
     #
     # DSL
     #
-    def respond(body:nil, status:200, &block)
-      @request_handler.responses << Response.new(body, status, &block)
+    def respond(body:nil, status:200, headers:{}, &block)
+      @request_handler.responses << Response.new(body, status, headers,  &block)
       self
     end
   end

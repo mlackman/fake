@@ -6,7 +6,7 @@ describe Fake::RequestHandler do
     context "when operation matches request operation" do
       it "returns response" do
         rh = Fake::RequestHandler.new(:get, '/home')
-        rh.responses << Fake::Response.new("", "200 OK")
+        rh.responses << Fake::Response.new("", "200 OK", {})
         expect(rh.call(get_request('http://localhost/home'))).not_to eq nil
       end
     end
