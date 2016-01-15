@@ -6,20 +6,11 @@ require_relative './fake/request_handler.rb'
 require_relative './fake/requests.rb'
 require_relative './fake/request.rb'
 require_relative './fake/fake.rb'
+require_relative './fake/response.rb'
 
 Thread.abort_on_exception = true
 
 module Fake
-  class Response
-    attr_reader :body, :status
-
-    def initialize(body, status)
-      @body = body
-      @status = status
-    end
-
-  end
-
   #
   # Queue which returns last value forever
   #
@@ -48,8 +39,8 @@ module Fake
     #
     # DSL
     #
-    def respond(body:nil, status:200)
-      @request_handler.responses << Response.new(body, status)
+    def respond(body:nil, status:200, &block)
+      @request_handler.responses << Response.new(body, status, &block)
       self
     end
   end

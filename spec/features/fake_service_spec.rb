@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'httparty'
+require 'pry'
 
 describe 'Fake Service' do
   let(:fs) { Fake::Service.new(port:4567) }
@@ -75,7 +76,7 @@ describe 'Fake Service' do
 
     describe "Checking request parameters" do
       it "can verify single parameter" do
-        fs.get('/cart')
+        fs.get('/cart').respond(body:'')
         fs.start
         HTTParty.get('http://localhost:4567/cart?id=5&status=pending')
         params = Fake::Requests.request(:get, '/cart').params
@@ -83,6 +84,7 @@ describe 'Fake Service' do
         expect(params.has_key? 'status')
         expect(params["id"]).to eq "5"
         expect(params["status"]).to eq "pending"
+
       end
 
       xit "can name a request to ease matching of request" do
@@ -147,6 +149,17 @@ describe 'Fake Service' do
         expect(HTTParty.get('http://localhost:4567/cart').response.body).to eq "3"
         expect(HTTParty.get('http://localhost:4567/cart').response.body).to eq "3"
       end
+    end
+  end
+
+  describe "using block" do
+    it "uses block return value as response" do
+      fs.get('/').respond do
+        "my response"
+      end
+      fs.start
+
+      expect(HTTParty.get('http://localhost:4567').response.body).to eq "my response"
     end
   end
 
