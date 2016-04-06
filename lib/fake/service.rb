@@ -23,6 +23,10 @@ module Fake
     def stop
       @server.stop
     end
+
+    def clear
+      @app.clear_request_handlers
+    end
   end
 end
 

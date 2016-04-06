@@ -21,20 +21,28 @@ describe 'Fake Service' do
   end
 
   describe "Simple service without parameters" do
-    before(:each) { Fake.start(port:4567) }
+    before(:each) { Fake.start(port:4568) }
     after(:each) { Fake.stop }
 
     it "can handle get" do
       Fake.get('/').respond(body:"_response_")
-      response = HTTParty.get('http://localhost:4567')
+      response = HTTParty.get('http://localhost:4568')
       expect(response.body).to eq "_response_"
     end
 
     it "can handle post" do
       Fake.post('/').respond(body:"_response_")
-      response = HTTParty.post('http://localhost:4567')
+      response = HTTParty.post('http://localhost:4568')
       expect(response.body).to eq "_response_"
     end
+    it "is possible to clear request handlers" do
+      Fake.get('/').respond(body:"response")
+      Fake.clear
+      Fake.get('/').respond(body:"other response")
+      response = HTTParty.get('http://localhost:4568')
+      expect(response.body).to eq "other response"
+    end
+
   end
 
   describe "Response code" do

@@ -54,6 +54,10 @@ module Fake
       @handlers << request_handler
     end
 
+    def clear_request_handlers
+      @handlers = []
+    end
+
     def call(env)
       request = Fake::Request.new(env)
 

@@ -8,6 +8,10 @@ module Fake
     def stop
       @fake_service.stop
     end
+
+    def clear
+      @fake_service.clear
+    end
   end
 
   def self.method_missing(method, *args, &block)
