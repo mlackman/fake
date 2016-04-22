@@ -78,8 +78,8 @@ describe 'Fake Service' do
     end
 
     describe "dynamic paths" do
-      xit "routes request to match path variables" do
-        fs.get('/cart/:id/status').response(body:"ok")
+      it "routes request to match path variables" do
+        fs.get('/cart/:id/status').respond(body:"ok")
         fs.start
         expect(HTTParty.get('http://localhost:4567/cart/path/status').response.body).to eq "ok"
       end

@@ -8,12 +8,12 @@ module Fake
     # path: Path of the request like '/home/something'
     def initialize(method, path)
       @method = method
-      @path = path
+      @path = Path.new(path)
       @responses = InfiniteQueue.new
     end
 
     def call(request)
-      if request.path.eql?(@path) && request.request_method.eql?(@method.to_s.upcase)
+      if @path.eql?(request.path) && request.request_method.eql?(@method.to_s.upcase)
         current_response = @responses.next
         raise "FAKE service: No response set for request #{presentation}" if current_response.nil?
         current_response.evaluate()

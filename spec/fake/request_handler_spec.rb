@@ -9,6 +9,14 @@ describe Fake::RequestHandler do
         rh.responses << Fake::Response.new("", "200 OK", {})
         expect(rh.call(get_request('http://localhost/home'))).not_to eq nil
       end
+
+      context "when dynamic path used" do
+        it "returns response" do
+          rh = Fake::RequestHandler.new(:get, '/home/:id/new')
+          rh.responses << Fake::Response.new("", "200 OK", {})
+          expect(rh.call(get_request('http://localhost/home/5/new'))).not_to eq nil
+        end
+      end
     end
 
     context "when operation does not match with request handler operation" do

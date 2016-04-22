@@ -7,6 +7,7 @@ require_relative './fake/requests.rb'
 require_relative './fake/request.rb'
 require_relative './fake/fake.rb'
 require_relative './fake/response.rb'
+require_relative './fake/path.rb'
 
 Thread.abort_on_exception = true
 
