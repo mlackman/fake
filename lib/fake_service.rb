@@ -37,9 +37,17 @@ module Fake
       @request_handler = request_handler
     end
 
+
     #
     # DSL
     #
+
+    # request body, which must match
+    def body(body)
+      @request_handler.body = body
+      self
+    end
+
     def respond(body:nil, status:200, headers:{}, &block)
       @request_handler.responses << Response.new(body, status, headers,  &block)
       self

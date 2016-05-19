@@ -6,6 +6,9 @@ module Fake
     end
 
     def stop
+      # todo: something better, stop fails if start and stop comes almost the same
+      # needs some check that if thread is alive and if not then yield (or something...)
+      sleep 0.5
       @fake_service.stop
     end
 

@@ -1,7 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    coderay (1.1.0)
+    byebug (8.2.2)
+    coderay (1.1.1)
     diff-lcs (1.2.5)
     httparty (0.13.3)
       json (~> 1.8)
@@ -9,7 +10,7 @@ GEM
     json (1.8.2)
     method_source (0.8.2)
     multi_xml (0.5.5)
-    pry (0.10.1)
+    pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
@@ -32,7 +33,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  byebug
   httparty
   pry
   rack
   rspec
+
+BUNDLED WITH
+   1.11.2

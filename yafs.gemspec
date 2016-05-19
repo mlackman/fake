@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "yafs"
-  s.version     = "0.0.6"
+  s.version     = "0.0.7"
   s.platform    = Gem::Platform::RUBY
   s.summary     = "Yet another fake http service for e2e tests"
   s.email       = "mika.lackman@gmail.com"

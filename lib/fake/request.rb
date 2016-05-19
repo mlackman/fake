@@ -4,10 +4,14 @@ module Fake
     def POST
       params = super
       if content_type && content_type.downcase == 'application/json'
-        hash = JSON.parse(body.gets)
+        hash = JSON.parse(body_string)
         params.merge!(hash)
       end
       params
+    end
+
+    def body_string
+      @body_string ||= body.gets
     end
 
   end

@@ -86,10 +86,24 @@ describe 'Fake Service' do
     end
 
     describe "Responding specific request" do
+      before do
+        Fake.start(port:4567)
+      end
+      after do
+        Fake.stop
+      end
+
       xit "can respond based on query parameter" do
         # what about specific parameters vs some parameter
         fs.get('/cart/option').param('id=5').respond("ok") # Matches /cart/option?id=5,
       end
+
+      it "can resbond based on specific body" do
+        Fake.post('/cart').body('{"var":1,"var2":"3"}').respond(body:"1")
+        Fake.post('/cart').body('{"var":1,"var2":"4"}').respond(body:"2")
+        expect(HTTParty.post('http://localhost:4567/cart', body:'{"var":1,"var2":"4"}').response.body).to eq "2"
+        expect(HTTParty.post('http://localhost:4567/cart', body:'{"var":1,"var2":"3"}').response.body).to eq "1"
+     end
     end
 
     describe "Checking request parameters" do
