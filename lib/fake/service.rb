@@ -10,12 +10,6 @@ module Fake
       @app.add_request_handler(request_handler)
     end
 
-    def get(path)
-      request_handler = RequestHandler.new(:get, path)
-      @app.add_request_handler(request_handler)
-      RequestHandlerBuilder.new(request_handler)
-    end
-
     def start
       @server.start(@app, @webrick_config)
     end

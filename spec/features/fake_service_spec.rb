@@ -7,11 +7,11 @@ describe 'Fake Service' do
   after(:each) { fs.stop }
 
   describe "configuration" do
-    let(:fs) { Fake::Service.new(bind:'127.0.0.1') }
     it "can be bind to different addresses" do
-      fs.get('/').respond(body:"ok")
-      fs.start
+      Fake.start(bind:'127.0.0.1', port:8080)
+      Fake.get('/').respond(body:"ok")
       expect(HTTParty.get('http://127.0.0.1:8080').body).to eq "ok"
+      Fake.stop
     end
   end
 
@@ -47,41 +47,44 @@ describe 'Fake Service' do
 
   describe "Response code" do
     it "returns assigned response code" do
-      fs.get('/').respond(status:404)
-      fs.start
-
+      Fake.start(port:4567)
+      Fake.get('/').respond(status:404)
       response = HTTParty.get('http://localhost:4567')
       expect(response.code).to eq 404
+      Fake.stop
     end
   end
 
   describe "Headers" do
     it "sets headers to response" do
-      fs.get('/').respond(headers: {"x-header" => "someurl"})
-      fs.start
+      Fake.start(port:4567)
+      Fake.get('/').respond(headers: {"x-header" => "someurl"})
       response = HTTParty.get('http://localhost:4567')
       expect(response.headers).to include("x-header")
       expect(response.headers['x-header']).to eq "someurl"
+      Fake.stop
     end
   end
 
   describe "Paths" do
     describe "static paths" do
       it "routes requests to correct handler" do
-        fs.get('/cart').respond(body:"1")
-        fs.get('/order/new').respond(body:"2")
-        fs.start
+        Fake.start(port:4567)
+        Fake.get('/cart').respond(body:"1")
+        Fake.get('/order/new').respond(body:"2")
 
         expect(HTTParty.get('http://localhost:4567/cart'     ).response.body).to eq "1"
         expect(HTTParty.get('http://localhost:4567/order/new').response.body).to eq "2"
+        Fake.stop
       end
     end
 
     describe "dynamic paths" do
       it "routes request to match path variables" do
-        fs.get('/cart/:id/status').respond(body:"ok")
-        fs.start
+        Fake.start(port:4567)
+        Fake.get('/cart/:id/status').respond(body:"ok")
         expect(HTTParty.get('http://localhost:4567/cart/path/status').response.body).to eq "ok"
+        Fake.stop
       end
     end
 
@@ -95,7 +98,7 @@ describe 'Fake Service' do
 
       xit "can respond based on query parameter" do
         # what about specific parameters vs some parameter
-        fs.get('/cart/option').param('id=5').respond("ok") # Matches /cart/option?id=5,
+        Fake.get('/cart/option').param('id=5').respond("ok") # Matches /cart/option?id=5,
       end
 
       it "can resbond based on specific body" do
@@ -108,22 +111,24 @@ describe 'Fake Service' do
 
     describe "Checking request parameters" do
       it "can verify single parameter" do
-        fs.get('/cart').respond(body:'')
-        fs.start
+        Fake.start(port:4567)
+        Fake.get('/cart').respond(body:'')
         HTTParty.get('http://localhost:4567/cart?id=5&status=pending')
         params = Fake::Requests.request(:get, '/cart').params
         expect(params.has_key? 'id')
         expect(params.has_key? 'status')
         expect(params["id"]).to eq "5"
         expect(params["status"]).to eq "pending"
+        Fake.stop
 
       end
 
       xit "can name a request to ease matching of request" do
-        fs.get('/cart', name: :my_cart_request)
-        fs.start
+        Fake.start
+        Fake.get('/cart', name: :my_cart_request)
         HTTParty.get('http://localhost:4567/cart?id=5&status=pending')
         expect(Fake::Requests.request(:my_cart_request)).not_to be nil
+        Fake.stop
       end
 
       context "from post request" do
@@ -173,32 +178,34 @@ describe 'Fake Service' do
   describe "Setting responses" do
     describe "chaining responses" do
       it "returns responses in order" do
-        fs.get('/cart').respond(body:"1").respond(body:"2").respond(body:"3")
-        fs.start
+        Fake.start(port:4567)
+        Fake.get('/cart').respond(body:"1").respond(body:"2").respond(body:"3")
         expect(HTTParty.get('http://localhost:4567/cart').response.body).to eq "1"
         expect(HTTParty.get('http://localhost:4567/cart').response.body).to eq "2"
         expect(HTTParty.get('http://localhost:4567/cart').response.body).to eq "3"
         expect(HTTParty.get('http://localhost:4567/cart').response.body).to eq "3"
         expect(HTTParty.get('http://localhost:4567/cart').response.body).to eq "3"
+        Fake.stop
       end
     end
   end
 
   describe "using block" do
     it "uses block return value as response" do
-      fs.get('/').respond do
+      Fake.start(port:4567)
+      Fake.get('/').respond do
         "my response"
       end
-      fs.start
       expect(HTTParty.get('http://localhost:4567').response.body).to eq "my response"
+      Fake.stop
     end
 
     it "can access response object" do
-      fs.get('/').respond do |r|
+      Fake.start(port:4567)
+      Fake.get('/').respond do |r|
         r.status = 201
         "response"
       end
-      fs.start
       expect(HTTParty.get('http://localhost:4567').response.code).to eq "201"
     end
 
