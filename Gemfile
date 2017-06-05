@@ -1,10 +1,11 @@
-source 'https://rubygems.org'
+source 'https://rubygems.org' do
 
-gem 'rack'
+  gem 'rack'
 
-group :development, :test do
-  gem 'pry'
-  gem 'byebug'
-  gem 'httparty'
-  gem 'rspec'
+  group :development, :test do
+    gem 'pry'
+    gem 'byebug'
+    gem 'httparty'
+    gem 'rspec'
+  end
 end

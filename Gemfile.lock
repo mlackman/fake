@@ -33,11 +33,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  byebug
-  httparty
-  pry
-  rack
-  rspec
+  byebug!
+  httparty!
+  pry!
+  rack!
+  rspec!
 
 BUNDLED WITH
-   1.11.2
+   1.14.6

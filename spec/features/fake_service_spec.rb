@@ -30,6 +30,11 @@ describe 'Fake Service' do
       expect(response.body).to eq "_response_"
     end
 
+    it "can handle shitty path" do
+      Fake.get('/path/?id=5').respond(body: 'ok')
+      expect(HTTParty.get('http://localhost:4568/path/?id=5').body).to eq 'ok'
+    end
+
     it "can handle post" do
       Fake.post('/').respond(body:"_response_")
       response = HTTParty.post('http://localhost:4568')
@@ -96,9 +101,10 @@ describe 'Fake Service' do
         Fake.stop
       end
 
-      xit "can respond based on query parameter" do
+      it "can respond based on query parameter" do
         # what about specific parameters vs some parameter
-        Fake.get('/cart/option').param('id=5').respond("ok") # Matches /cart/option?id=5,
+        Fake.get('/cart/option?id=5').respond(body: "ok")
+        expect(HTTParty.get('http://localhost:4567/cart/option?id=5').response.body).to eq "ok"
       end
 
       it "can resbond based on specific body" do

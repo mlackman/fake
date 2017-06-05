@@ -33,4 +33,40 @@ describe Fake::RequestHandler do
       expect(rh.call(get_request('http://localhost/home'))).to eq nil
     end
   end
+
+  context "when path contains query parameters" do
+    context "when path and parameters match" do
+      it "returns the response" do
+        rh = Fake::RequestHandler.new(:get, '/home?param=1')
+        rh.responses << Fake::Response.new("", "200 OK", {})
+        expect(rh.call(get_request('http://localhost/home?param=1'))).not_to eq nil
+      end
+    end
+
+    context "when path matches but parameter does not match" do
+      it "returns nil" do
+        rh = Fake::RequestHandler.new(:get, '/home?param=1')
+        rh.responses << Fake::Response.new("", "200 OK", {})
+        expect(rh.call(get_request('http://localhost/home?param=2'))).to eq nil
+      end
+    end
+  end
+
+  context "when path is not well formatted with query params" do
+    context "when path and query matches" do
+      it "returns the response" do
+        rh = Fake::RequestHandler.new(:get, '/home/?param=1')
+        rh.responses << Fake::Response.new("", "200 OK", {})
+        expect(rh.call(get_request('http://localhost/home/?param=1'))).not_to eq nil
+      end
+    end
+    context "when path matches but query does not" do
+      it "returns the response" do
+        rh = Fake::RequestHandler.new(:get, '/home/?param=2')
+        rh.responses << Fake::Response.new("", "200 OK", {})
+        expect(rh.call(get_request('http://localhost/home/?param=1'))).to eq nil
+      end
+    end
+
+  end
 end
