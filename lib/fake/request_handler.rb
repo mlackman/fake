@@ -31,7 +31,7 @@ module Fake
   private
     def should_serve?(request)
       should_serve = @path.eql?(request.path) && request.request_method.eql?(@method.to_s.upcase)
-      if should_serve
+      if should_serve && @params != {}
         should_serve = request.params == @params
       end
       if should_serve && @body != nil
